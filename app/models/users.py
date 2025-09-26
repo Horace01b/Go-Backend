@@ -45,3 +45,4 @@ class Game(db.Model):
 
     created_at = db.Column(db.DateTime(timezone=True), default=utc_now, nullable=False)
     ended_at = db.Column(db.DateTime(timezone=True))
+    
