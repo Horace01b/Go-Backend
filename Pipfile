@@ -10,6 +10,7 @@ flask-migrate = "*"
 psycopg = {extras = ["binary", "pool"], version = "*"}
 python-dotenv = "*"
 flask-cors = "*"
+flask-bcrypt = "*"
 
 [dev-packages]
 
