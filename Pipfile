@@ -11,6 +11,7 @@ psycopg = {extras = ["binary", "pool"], version = "*"}
 python-dotenv = "*"
 flask-cors = "*"
 flask-bcrypt = "*"
+flask-jwt-extended = "*"
 
 [dev-packages]
 
