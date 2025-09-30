@@ -15,7 +15,7 @@ def get_active_game(user_id):
 @game_bp.route("/new", methods=["POST"])
 @jwt_required() 
 def new_game():
-    user_id = get_jwt_identity()  
+    user_id = int(get_jwt_identity())
 
     # End any previous active game
     active = get_active_game(user_id)
@@ -43,13 +43,14 @@ def new_game():
 @game_bp.route("/active", methods=["GET"])
 @jwt_required()
 def active_game():
-    user_id = get_jwt_identity()
+    user_id = int(get_jwt_identity())
     game = get_active_game(user_id)
 
     if not game:
         return jsonify({"message": "No active game"}), 404
 
     return jsonify({
+        "user_id": game.user_id,
         "id": game.id,
         "board": game.board_state,
         "turn": game.current_turn,
@@ -61,7 +62,7 @@ def active_game():
 @game_bp.route("/move", methods=["POST"])
 @jwt_required()
 def make_move():
-    user_id = get_jwt_identity()
+    user_id = int(get_jwt_identity())
     data = request.get_json()
 
     game = get_active_game(user_id)
@@ -73,14 +74,16 @@ def make_move():
     game.board_state = data.get("board", game.board_state)
     game.current_turn = data.get("turn", game.current_turn)
     game.scores = data.get("scores", game.scores)
-    game.captured_stones = data.get("captured", game.captured_stones)
+    game.captured_white = data.get("captured_white", game.captured_white)
+    game.captured_black = data.get("captured_black", game.captured_black)
 
     db.session.commit()
     return jsonify({
         "board": game.board_state,
         "turn": game.current_turn,
         "scores": game.scores,
-        "captured": game.captured_stones,
+        "captured_white": game.captured_white,
+        "captured_black": game.captured_black,
         "state": game.state,
     })
 
@@ -90,7 +93,7 @@ def make_move():
 @game_bp.route("/pass", methods=["POST"])
 @jwt_required()
 def pass_turn():
-    user_id = get_jwt_identity()
+    user_id = int(get_jwt_identity())
     game = get_active_game(user_id)
 
     if not game:
@@ -119,7 +122,7 @@ def pass_turn():
 @game_bp.route("/finish", methods=["POST"])
 @jwt_required()
 def finish_game():
-    user_id = get_jwt_identity()
+    user_id = int(get_jwt_identity())
     game = get_active_game(user_id)
 
     if not game:
@@ -141,7 +144,7 @@ def finish_game():
 @game_bp.route("/history", methods=["GET"])
 @jwt_required()
 def game_history():
-    user_id = get_jwt_identity()
+    user_id = int(get_jwt_identity())
 
     
     games = Game.query.filter_by(user_id=user_id).order_by(Game.created_at.desc()).all()
