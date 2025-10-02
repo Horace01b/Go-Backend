@@ -47,6 +47,7 @@ def signup():
 
     password_hash = bcrypt.generate_password_hash(password).decode("utf-8")
     new_user = User(name=name, email=email, password_hash=password_hash)
+
     db.session.add(new_user)
     try:
         db.session.commit()
@@ -54,7 +55,10 @@ def signup():
         db.session.rollback()
         current_app.logger.exception("Failed to create user")
         return jsonify({"error": "internal server error"}), 500
-    return jsonify({"message": "user created", "user": public_user_dict(new_user)}), 201
+    access_token = create_access_token(identity=str(new_user.id))
+    return jsonify({"message": f"user {name} created", 
+                    "access_token": access_token,
+                    "user": public_user_dict(new_user)}), 201
 
 # Login Route
 @user_bp.route("/login", methods=["POST"])
