@@ -6,6 +6,7 @@ from .routes import user_bp,game_bp
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager
 from datetime import timedelta
+from flask_cors import CORS 
 
 bcrypt = Bcrypt()
 jwt = JWTManager()
@@ -20,7 +21,11 @@ def create_app():
     migrate.init_app(app,db)
     bcrypt.init_app(app)
     jwt.init_app(app)
+
     
+    CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}})
+
+
     app.register_blueprint(user_bp)
     app.register_blueprint(game_bp)
     # app.register_blueprint(student_bp,url_prefix="/student")
