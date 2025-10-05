@@ -21,7 +21,9 @@ def create_app():
     migrate.init_app(app,db)
     bcrypt.init_app(app)
     jwt.init_app(app)
-    CORS(app)
+    # CORS(app)
+    CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}}, supports_credentials=True)
+
     
     app.register_blueprint(user_bp)
     app.register_blueprint(game_bp)
