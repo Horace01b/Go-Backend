@@ -25,13 +25,12 @@ def new_game():
 
     # Create a new game
     data = request.get_json() or {}
-    game = Game(
-        user_id=user_id,
-        board_state=data.get("board", {}),   
-        current_turn=data.get("turn", "black"), 
-        scores=data.get("scores", {}),
-        state="ongoing"
-    )
+    game = Game()
+    game.user_id = user_id
+    game.board_state = data.get("board", {})
+    game.current_turn = data.get("turn", "black")
+    game.scores = data.get("scores", {})
+    game.state = "ongoing"
 
     db.session.add(game)
     db.session.commit()
@@ -133,7 +132,7 @@ def finish_game():
     game.state = "finished"
     game.ended_at = utc_now()
     game.scores = data.get("scores", game.scores)
-    game.won_by = data.get("won_by", game.won_by)
+    game.won_by = data.get("won_by")
 
     db.session.commit()
 
