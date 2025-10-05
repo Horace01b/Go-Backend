@@ -18,13 +18,11 @@ def get_active_game(user_id):
 def new_game():
     user_id = int(get_jwt_identity())
 
-    # End any previous active game
     active = get_active_game(user_id)
     if active:
         active.state = "abandoned"
         active.ended_at = utc_now()
 
-    # Create a new game
     data = request.get_json() or {}
     game = Game(
         user_id=user_id,
@@ -36,6 +34,7 @@ def new_game():
 
     db.session.add(game)
     db.session.commit()
+    print("New game has begun")
 
     return jsonify({"message": "New game started", "game_id": game.id}), 201
 
@@ -58,6 +57,7 @@ def active_game():
         "scores": game.scores,
         "state": game.state,
     })
+    print("resume a game")
 
 
 @game_bp.route("/move", methods=["POST"])
@@ -72,27 +72,27 @@ def make_move():
     if game.state != "ongoing":
         return jsonify({"error": "Game already finished"}), 400
 
-    # --- Update the current game snapshot ---
+    # --- Update the current game 
     game.board_state = data.get("board", game.board_state)
     game.current_turn = data.get("turn", game.current_turn)
     game.scores = data.get("scores", game.scores)
     game.captured_white = data.get("captured_white", game.captured_white)
     game.captured_black = data.get("captured_black", game.captured_black)
 
-    # --- Record the move ---
     move = Move(
         game_id=game.id,
-        player_color=data.get("color"),        # "black" or "white"
+        player_color=data.get("color"),       
         x=data.get("x"),
         y=data.get("y"),
-        move_type="play",                      # ✅ always "play"
+        move_type="play",                     
         captures_black=game.captured_black,
         captures_white=game.captured_white,
         scores=game.scores,
     )
 
     db.session.add(move)
-    db.session.commit()  # ✅ persists both Game + Move
+    db.session.commit()  
+    print(f"Saved move for game {game.id}, player {move.player_color} at ({move.x}, {move.y})")
 
     return jsonify({
         "message": "Move recorded successfully",
@@ -125,10 +125,9 @@ def pass_turn():
     if game.state == "finished":  
         game.ended_at = utc_now()
 
-    # Record the pass as a move
     move = Move(
         game_id=game.id,
-        player_color=data.get("color"),  # still send from frontend
+        player_color=data.get("color"), 
         x=None,
         y=None,
         captures_black=game.captured_black,
@@ -139,6 +138,7 @@ def pass_turn():
 
     db.session.add(move)
     db.session.commit()
+    print("i have passed")
 
     return jsonify({
         "board": game.board_state,
@@ -163,11 +163,10 @@ def finish_game():
     game.scores = data.get("scores", game.scores)
     game.won_by = data.get("won_by", game.won_by)
 
-    # Optional: record resignation as move
     if data.get("resign"):
         move = Move(
             game_id=game.id,
-            player_color=data.get("resign"),  # "black" or "white"
+            player_color=data.get("resign"), 
             move_type="resign",
             captures_black=game.captured_black,
             captures_white=game.captured_white,

@@ -23,7 +23,9 @@ def create_app():
     jwt.init_app(app)
 
     
-    CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}})
+    #CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}})
+    CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}}, supports_credentials=True)
+
 
 
     app.register_blueprint(user_bp)
