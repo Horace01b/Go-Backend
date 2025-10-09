@@ -22,7 +22,9 @@ def create_app():
     bcrypt.init_app(app)
     jwt.init_app(app)
     # CORS(app)
-    CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}}, supports_credentials=True)
+    CORS(app, resources={r"/*": {"origins": ["http://localhost:5173",
+                                             "https://go-frontend-coral.vercel.app/"
+                                             ]}}, supports_credentials=True)
 
     
     app.register_blueprint(user_bp)
