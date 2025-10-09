@@ -29,4 +29,8 @@ def create_app():
     app.register_blueprint(game_bp)
     # app.register_blueprint(student_bp,url_prefix="/student")
 
+    @app.route("/")
+    def Home():
+        return "Go Game Fullstack API is working"
+
     return app
