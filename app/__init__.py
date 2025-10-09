@@ -23,7 +23,7 @@ def create_app():
     jwt.init_app(app)
     # CORS(app)
     CORS(app, resources={r"/*": {"origins": ["http://localhost:5173",
-                                             "https://go-frontend-coral.vercel.app/"
+                                             "https://go-frontend-coral.vercel.app"
                                              ]}}, supports_credentials=True)
 
     
